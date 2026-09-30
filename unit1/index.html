@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 Assignment — Student Version</title>
+<style>
+:root {
+  --navy:#163a5f; --blue:#2563eb; --light:#eef4fb; --border:#d7e0ea;
+  --green:#16803c; --red:#c62828; --text:#17202a; --muted:#667085;
+}
+* {box-sizing:border-box}
+body {margin:0;font-family:Arial, "Noto Sans SC", sans-serif;background:#f5f7fa;color:var(--text);line-height:1.65}
+header {background:var(--navy);color:white;padding:24px 28px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px #0002}
+.header-inner {max-width:1100px;margin:auto;display:flex;gap:20px;align-items:center;justify-content:space-between}
+h1 {margin:0;font-size:28px}
+.subtitle {opacity:.85;margin-top:4px}
+.progress-wrap {min-width:240px}
+.progress-label {font-size:13px;margin-bottom:5px;text-align:right}
+.progress {height:8px;background:#ffffff44;border-radius:10px;overflow:hidden}
+.progress > div {height:100%;width:0;background:#fff;transition:.2s}
+main {max-width:1000px;margin:28px auto;padding:0 18px 80px}
+.card {background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px;box-shadow:0 3px 12px #17324d0a}
+.info-grid {display:grid;grid-template-columns:1fr 1fr;gap:14px}
+input[type=text] {width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
+label.field {font-weight:600;font-size:14px}
+label.field input {display:block;margin-top:6px;font-weight:400}
+h2 {color:var(--navy);margin:4px 0 10px;font-size:23px}
+.instructions {background:var(--light);border-left:4px solid var(--blue)}
+.question {background:white;border:1px solid var(--border);border-radius:12px;padding:20px;margin:14px 0}
+.qhead {display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qnum {background:var(--blue);color:white;border-radius:50%;width:32px;height:32px;display:grid;place-items:center;font-weight:bold}
+.qtype {font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.prompt {font-size:18px;margin:8px 0 15px}
+.options {display:grid;gap:9px}
+.option {display:flex;align-items:center;gap:10px;border:1px solid #dce3ea;padding:11px 13px;border-radius:9px;cursor:pointer}
+.option:hover {background:#f8fbff;border-color:#9db9dd}
+.option input {accent-color:var(--blue);transform:scale(1.1)}
+.letter {font-weight:bold;color:var(--blue);width:20px}
+.cloze-intro {font-size:17px}
+.word-bank {display:flex;flex-wrap:wrap;gap:8px;margin:15px 0;padding:14px;background:#f8fafc;border:1px dashed #b9c5d3;border-radius:9px}
+.word {padding:4px 9px;background:#e9f0f8;border-radius:6px;font-size:14px}
+.cloze-text {font-size:17px}
+.cloze-text select {margin:0 3px;padding:5px 8px;border:1px solid #b9c5d3;border-radius:6px;font-size:15px;background:white}
+.zh {font-size:20px;background:#fafafa;border-radius:8px;padding:14px}
+.hint {font-size:14px;color:var(--blue);margin-bottom:8px}
+textarea {width:100%;min-height:130px;padding:13px;border:1px solid #cbd5e1;border-radius:9px;font:17px/1.6 Arial,sans-serif;resize:vertical}
+.actions {position:fixed;bottom:0;left:0;right:0;background:#ffffffee;backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:10px;z-index:30}
+.actions-inner {max-width:1000px;margin:auto;display:flex;gap:10px;justify-content:flex-end}
+button {border:0;border-radius:8px;padding:10px 16px;font-size:15px;cursor:pointer}
+.primary {background:var(--blue);color:white}
+.secondary {background:#e8eef5;color:var(--navy)}
+.danger {background:#fff0f0;color:#a61b1b}
+#result {display:none}
+.score {font-size:30px;font-weight:700;color:var(--navy)}
+.small {color:var(--muted);font-size:14px}
+@media(max-width:700px){
+  .header-inner,.info-grid{display:block}
+  .progress-wrap{margin-top:12px}
+  h1{font-size:22px}
+  .prompt,.cloze-text{font-size:16px}
+  .info-grid > *{margin-bottom:12px}
+}
+
+.teacher-panel{display:none;margin:24px 0;padding:22px;border:2px solid #2563eb;border-radius:14px;background:#eef4fb}.teacher-mode .teacher-panel{display:block}.grade-table{width:100%;border-collapse:collapse;margin:16px 0;background:#fff}.grade-table th,.grade-table td{border:1px solid #cbd5e1;padding:10px;text-align:left;vertical-align:top}.grade-table th{background:#e8f0fa}.grade-input{width:80px;padding:8px;font-size:16px}.teacher-btn{border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600;margin-right:8px}.final-grade{font-size:24px;font-weight:700;color:#163a5f;margin-top:18px;padding:16px;background:#fff;border-radius:10px}.small-note{color:#475569;font-size:14px}
+</style>
+</head>
+<body><div style="position:sticky;top:0;z-index:9999;background:#163a5f;padding:9px 14px;text-align:right"><button type="button" onclick="setTeacherMode(false)">Student Mode</button> <button type="button" onclick="setTeacherMode(true)">Teacher Mode</button></div>
+<header>
+  <div class="header-inner">
+    <div><h1>Unit 3 Assignment</h1><div class="subtitle">Student Assignment · Comprehensive Practice</div></div>
+    <div class="progress-wrap">
+      <div class="progress-label" id="progressLabel">0 / 22 answered</div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+  </div>
+</header>
+
+<main><section class="teacher-panel"><h2>Teacher Grading</h2><p class="small-note">Load a student's JSON submission, then enter 0–5 points for each translation.</p><p><input id="submissionFile" type="file" accept=".json,application/json" onchange="loadStudentSubmission(event)"></p><table class="grade-table"><thead><tr><th>Question</th><th>Student translation</th><th>Score / 5</th></tr></thead><tbody><tr><td>17</td><td id="student17">—</td><td><input class="grade-input" id="grade17" type="number" min="0" max="5" step="0.1"></td></tr><tr><td>18</td><td id="student18">—</td><td><input class="grade-input" id="grade18" type="number" min="0" max="5" step="0.1"></td></tr><tr><td>19</td><td id="student19">—</td><td><input class="grade-input" id="grade19" type="number" min="0" max="5" step="0.1"></td></tr><tr><td>20</td><td id="student20">—</td><td><input class="grade-input" id="grade20" type="number" min="0" max="5" step="0.1"></td></tr><tr><td>21</td><td id="student21">—</td><td><input class="grade-input" id="grade21" type="number" min="0" max="5" step="0.1"></td></tr><tr><td>22</td><td id="student22">—</td><td><input class="grade-input" id="grade22" type="number" min="0" max="5" step="0.1"></td></tr></tbody></table><button class="teacher-btn" onclick="calculateTeacherScore()">Calculate Final Score</button><button class="teacher-btn" onclick="saveTeacherGrades()">Save Grades</button><div id="teacherResult" class="final-grade">Final score: — / 100</div><p id="teacherBreakdown" class="small-note"></p></section>
+  <div class="card">
+    <div class="info-grid">
+      <label class="field">Student Name<input id="studentName" type="text" placeholder="Enter your name"></label>
+      <label class="field">Student ID<input id="studentId" type="text" placeholder="Enter your student ID"></label>
+    </div>
+  </div>
+
+  <div class="card instructions">
+    <h2>Instructions</h2>
+    <ul>
+      <li>Complete all 22 questions.</li>
+      <li>For Questions 1–15, choose one answer.</li>
+      <li>For Question 16, choose the appropriate capital letter for each blank.</li>
+      <li>For Questions 17–22, write an English translation in the text box.</li>
+      <li>Your work is saved automatically in this browser. You can return later and continue.</li>
+      <li>This student version does not display the answer key or teacher comments.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Part I · Vocabulary in Context</h2>
+    
+    <section class="question" id="q1">
+      <div class="qhead"><span class="qnum">1</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The _______ of fresh fruits and vegetables in the local market improves significantly during the summer months when local farms are at peak production.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q1" value="A">
+          <span class="letter">A</span><span>quality</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q1" value="B">
+          <span class="letter">B</span><span>availability</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q1" value="C">
+          <span class="letter">C</span><span>price</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q1" value="D">
+          <span class="letter">D</span><span>variety</span>
+        </label></div>
+    </section>
+    <section class="question" id="q2">
+      <div class="qhead"><span class="qnum">2</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">After moving closer to the city center, her daily _______ was cut from ninety minutes to just twenty, giving her more time with her family.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q2" value="A">
+          <span class="letter">A</span><span>commute</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q2" value="B">
+          <span class="letter">B</span><span>schedule</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q2" value="C">
+          <span class="letter">C</span><span>workload</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q2" value="D">
+          <span class="letter">D</span><span>expense</span>
+        </label></div>
+    </section>
+    <section class="question" id="q3">
+      <div class="qhead"><span class="qnum">3</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">Small businesses often have to _______ with rising operational costs and intense competition from large corporations.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q3" value="A">
+          <span class="letter">A</span><span>cooperate</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q3" value="B">
+          <span class="letter">B</span><span>contend</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q3" value="C">
+          <span class="letter">C</span><span>agree</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q3" value="D">
+          <span class="letter">D</span><span>negotiate</span>
+        </label></div>
+    </section>
+    <section class="question" id="q4">
+      <div class="qhead"><span class="qnum">4</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The library launched a project to _______ its collection of historical newspapers, making them searchable and accessible online for researchers worldwide.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q4" value="A">
+          <span class="letter">A</span><span>print</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q4" value="B">
+          <span class="letter">B</span><span>digitize</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q4" value="C">
+          <span class="letter">C</span><span>organize</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q4" value="D">
+          <span class="letter">D</span><span>display</span>
+        </label></div>
+    </section>
+    <section class="question" id="q5">
+      <div class="qhead"><span class="qnum">5</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The school’s _______ funding for science equipment meant that students had to share outdated microscopes and lacked access to modern laboratory tools.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q5" value="A">
+          <span class="letter">A</span><span>generous</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q5" value="B">
+          <span class="letter">B</span><span>adequate</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q5" value="C">
+          <span class="letter">C</span><span>inadequate</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q5" value="D">
+          <span class="letter">D</span><span>sufficient</span>
+        </label></div>
+    </section>
+    <section class="question" id="q6">
+      <div class="qhead"><span class="qnum">6</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The city invested heavily in its public transportation _______ , adding new subway lines and upgrading bus stations to reduce traffic congestion.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q6" value="A">
+          <span class="letter">A</span><span>infrastructure</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q6" value="B">
+          <span class="letter">B</span><span>regulation</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q6" value="C">
+          <span class="letter">C</span><span>budget</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q6" value="D">
+          <span class="letter">D</span><span>service</span>
+        </label></div>
+    </section>
+    <section class="question" id="q7">
+      <div class="qhead"><span class="qnum">7</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The small island has only about 200 permanent _______ , but its population triples during the tourist season.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q7" value="A">
+          <span class="letter">A</span><span>visitors</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q7" value="B">
+          <span class="letter">B</span><span>inhabitants</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q7" value="C">
+          <span class="letter">C</span><span>workers</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q7" value="D">
+          <span class="letter">D</span><span>owners</span>
+        </label></div>
+    </section>
+    <section class="question" id="q8">
+      <div class="qhead"><span class="qnum">8</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The _______ government announced plans to build three new public parks and renovate the city’s aging water treatment facilities.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q8" value="A">
+          <span class="letter">A</span><span>federal</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q8" value="B">
+          <span class="letter">B</span><span>municipal</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q8" value="C">
+          <span class="letter">C</span><span>state</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q8" value="D">
+          <span class="letter">D</span><span>national</span>
+        </label></div>
+    </section>
+    <section class="question" id="q9">
+      <div class="qhead"><span class="qnum">9</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The river’s water level rose so high that it threatened to _______ its banks, forcing residents in low-lying areas to evacuate.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q9" value="A">
+          <span class="letter">A</span><span>overflow</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q9" value="B">
+          <span class="letter">B</span><span>cross</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q9" value="C">
+          <span class="letter">C</span><span>reach</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q9" value="D">
+          <span class="letter">D</span><span>approach</span>
+        </label></div>
+    </section>
+    <section class="question" id="q10">
+      <div class="qhead"><span class="qnum">10</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The committee determined that the proposed solution, while theoretically sound, was not _______ given the current budget constraints and tight deadline.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q10" value="A">
+          <span class="letter">A</span><span>practicable</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q10" value="B">
+          <span class="letter">B</span><span>popular</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q10" value="C">
+          <span class="letter">C</span><span>profitable</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q10" value="D">
+          <span class="letter">D</span><span>permanent</span>
+        </label></div>
+    </section>
+    <section class="question" id="q11">
+      <div class="qhead"><span class="qnum">11</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">After working sixteen hours straight, she was _______ exhausted and could barely keep her eyes open.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q11" value="A">
+          <span class="letter">A</span><span>hardly</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q11" value="B">
+          <span class="letter">B</span><span>slightly</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q11" value="C">
+          <span class="letter">C</span><span>practically</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q11" value="D">
+          <span class="letter">D</span><span>occasionally</span>
+        </label></div>
+    </section>
+    <section class="question" id="q12">
+      <div class="qhead"><span class="qnum">12</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The company’s _______ restructuring involved laying off half its workforce and completely abandoning its traditional product line.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q12" value="A">
+          <span class="letter">A</span><span>gradual</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q12" value="B">
+          <span class="letter">B</span><span>radical</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q12" value="C">
+          <span class="letter">C</span><span>superficial</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q12" value="D">
+          <span class="letter">D</span><span>temporary</span>
+        </label></div>
+    </section>
+    <section class="question" id="q13">
+      <div class="qhead"><span class="qnum">13</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">With the rise of _______ usage, many young people now prefer texting and video calls over traditional voice calls.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q13" value="A">
+          <span class="letter">A</span><span>laptop</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q13" value="B">
+          <span class="letter">B</span><span>smartphone</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q13" value="C">
+          <span class="letter">C</span><span>tablet</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q13" value="D">
+          <span class="letter">D</span><span>desktop</span>
+        </label></div>
+    </section>
+    <section class="question" id="q14">
+      <div class="qhead"><span class="qnum">14</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">The sudden increase in patient numbers placed a severe _______ on the hospital’s emergency room staff and resources.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q14" value="A">
+          <span class="letter">A</span><span>strain</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q14" value="B">
+          <span class="letter">B</span><span>benefit</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q14" value="C">
+          <span class="letter">C</span><span>relief</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q14" value="D">
+          <span class="letter">D</span><span>balance</span>
+        </label></div>
+    </section>
+    <section class="question" id="q15">
+      <div class="qhead"><span class="qnum">15</span><span class="qtype">Multiple Choice</span></div>
+      <p class="prompt">Rapid _______ has led to the expansion of cities into surrounding rural areas, creating challenges for transportation and housing.</p>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="q15" value="A">
+          <span class="letter">A</span><span>industrialization</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q15" value="B">
+          <span class="letter">B</span><span>modernization</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q15" value="C">
+          <span class="letter">C</span><span>urbanization</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="q15" value="D">
+          <span class="letter">D</span><span>globalization</span>
+        </label></div>
+    </section>
+  </div>
+
+  <div class="card">
+    <h2>Part II · Reading Cloze</h2>
+    <p class="cloze-intro">Choose the correct capital letter for each blank.</p>
+    <div class="word-bank">
+      <span class="word"><b>A)</b> cater</span><span class="word"><b>B)</b> commute</span><span class="word"><b>C)</b> contend</span><span class="word"><b>D)</b> embrace</span><span class="word"><b>E)</b> inhabitants</span><span class="word"><b>F)</b> practicable</span><span class="word"><b>G)</b> practical</span><span class="word"><b>H)</b> radical</span><span class="word"><b>I)</b> relocation</span><span class="word"><b>J)</b> reshaped</span><span class="word"><b>K)</b> retrofit</span><span class="word"><b>L)</b> sync</span><span class="word"><b>M)</b> usher</span><span class="word"><b>N)</b> urbanization</span><span class="word"><b>O)</b> utility</span>
+    </div>
+    <div class="question">
+      <div class="qhead"><span class="qnum">16</span><span class="qtype">Cloze</span></div>
+      <div class="cloze-text">Evolving technologies are turning science fiction into reality. With the widespread availability of smart technologies, our lifestyles have been
+<strong>1</strong> <<select name="c1" aria-label="Blank 1"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>>, from the way we communicate and shop to the way we <strong>2</strong> <<select name="c2" aria-label="Blank 2"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> and work.
+Cities have to evolve as well to be in <strong>3</strong> <<select name="c3" aria-label="Blank 3"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> with the times. For instance, information technology is becoming the fourth
+<strong>4</strong> <<select name="c4" aria-label="Blank 4"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> and contributing to the smart city projects. There are different approaches to making cities smart to
+<strong>5</strong> <<select name="c5" aria-label="Blank 5"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> to the needs of an increasing population resulting from increasing <strong>6</strong> <<select name="c6" aria-label="Blank 6"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>>.
+
+We can digitize or <strong>7</strong> <<select name="c7" aria-label="Blank 7"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> our existing infrastructures in service, which might be a more
+<strong>8</strong> <<select name="c8" aria-label="Blank 8"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> or faster solution. We can also construct completely new smart cities, which might be more
+<strong>9</strong> <<select name="c9" aria-label="Blank 9"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>> and ambitious, and will arouse some questioning or even criticism. Although the technologies are doomed to get outdated,
+it should not be an excuse for us not to <strong>10</strong> <<select name="c1" aria-label="Blank 1"><option value="">Select</option><option value="A">A) cater</option><option value="B">B) commute</option><option value="C">C) contend</option><option value="D">D) embrace</option><option value="E">E) inhabitants</option><option value="F">F) practicable</option><option value="G">G) practical</option><option value="H">H) radical</option><option value="I">I) relocation</option><option value="J">J) reshaped</option><option value="K">K) retrofit</option><option value="L">L) sync</option><option value="M">M) usher</option><option value="N">N) urbanization</option><option value="O">O) utility</option></select>0> in technological innovations.
+Whichever approach we adopt, cities are expected to become smarter in order to meet the changing needs of urban...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Part III · Translation</h2>
+    
+    <section class="question translation" id="q17">
+      <div class="qhead"><span class="qnum">17</span><span class="qtype">Translation</span></div>
+      <p class="zh">智能技术将被广泛应用到城市建设之中，从而极大程度地改变我们的生活方式。</p>
+      <div class="hint">Use: be going to + verb.</div>
+      <textarea name="t17" placeholder="Write your English translation here..."></textarea>
+    </section>
+    <section class="question translation" id="q18">
+      <div class="qhead"><span class="qnum">18</span><span class="qtype">Translation</span></div>
+      <p class="zh">太阳能将为智能城市提供能源，其城市居民使用低能电器，从而减少能耗。</p>
+      <div class="hint">Use: be about to + verb.</div>
+      <textarea name="t18" placeholder="Write your English translation here..."></textarea>
+    </section>
+    <section class="question translation" id="q19">
+      <div class="qhead"><span class="qnum">19</span><span class="qtype">Translation</span></div>
+      <p class="zh">智能城市项目致力于改善城市基础设施和公共服务，为民众的工作和生活提供更加便利的条件。</p>
+      
+      <textarea name="t19" placeholder="Write your English translation here..."></textarea>
+    </section>
+    <section class="question translation" id="q20">
+      <div class="qhead"><span class="qnum">20</span><span class="qtype">Translation</span></div>
+      <p class="zh">不断发展的技术正在改变我们的生活方式，其速度之快超乎我们想象。</p>
+      
+      <textarea name="t20" placeholder="Write your English translation here..."></textarea>
+    </section>
+    <section class="question translation" id="q21">
+      <div class="qhead"><span class="qnum">21</span><span class="qtype">Translation</span></div>
+      <p class="zh">智能技术正改变城市规划和建设。</p>
+      
+      <textarea name="t21" placeholder="Write your English translation here..."></textarea>
+    </section>
+    <section class="question translation" id="q22">
+      <div class="qhead"><span class="qnum">22</span><span class="qtype">Translation</span></div>
+      <p class="zh">城市化程度的提高意味着需要更多地消耗已濒临枯竭的资源。</p>
+      
+      <textarea name="t22" placeholder="Write your English translation here..."></textarea>
+    </section>
+  </div>
+
+  <div class="card" id="result">
+    <h2>Submission Result</h2>
+    <div class="score" id="objectiveScore"></div>
+    <p id="resultText"></p>
+    <p class="small">Questions 17–22 require teacher evaluation and are not included in the automatic objective score.</p>
+  </div>
+</main>
+
+<div class="actions">
+  <div class="actions-inner">
+    <button class="secondary" onclick="saveNow()">Save</button>
+    <button class="secondary" onclick="downloadSubmission()">Download Submission</button>
+    <button class="danger" onclick="resetAssignment()">Reset</button>
+    <button class="primary" onclick="submitAssignment()">Submit Assignment</button>
+  </div>
+</div>
+
+<script>
+const ANSWERS = {"1": "B", "2": "A", "3": "B", "4": "B", "5": "C", "6": "A", "7": "B", "8": "B", "9": "A", "10": "A", "11": "C", "12": "B", "13": "B", "14": "A", "15": "C", "c1": "J", "c2": "B", "c3": "L", "c4": "O", "c5": "A", "c6": "N", "c7": "K", "c8": "F", "c9": "H", "c10": "M"};
+const STORAGE_KEY = "unit3StudentAssignment_v1";
+
+function allControls() {
+  return [...document.querySelectorAll("input, select, textarea")];
+}
+
+function updateProgress() {
+  const answered = allControls().filter(el => {
+    if (el.id === "studentName" || el.id === "studentId") return false;
+    if (el.type === "radio") return el.checked;
+    return el.value.trim() !== "";
+  });
+  // Radio groups count once.
+  const groups = new Set([...document.querySelectorAll('input[type=radio]')].map(x=>x.name));
+  let count = 0;
+  groups.forEach(g => { if (document.querySelector(`input[name="${g}"]:checked`)) count++; });
+  count += [...document.querySelectorAll("select, textarea")].filter(x=>x.value.trim() !== "").length;
+  document.getElementById("progressLabel").textContent = `${count} / 22 answered`;
+  document.getElementById("progressBar").style.width = `${Math.min(100, count/22*100)}%`;
+}
+
+function saveNow(show=true) {
+  const data = {name:document.getElementById("studentName").value, id:document.getElementById("studentId").value, answers:{}};
+  document.querySelectorAll('input[type=radio]:checked').forEach(x=>data.answers[x.name]=x.value);
+  document.querySelectorAll("select, textarea").forEach(x=>data.answers[x.name]=x.value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  updateProgress();
+  if(show) alert("Your work has been saved in this browser.");
+}
+
+function loadSaved() {
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try {
+    const data=JSON.parse(raw);
+    document.getElementById("studentName").value=data.name||"";
+    document.getElementById("studentId").value=data.id||"";
+    for(const [name,value] of Object.entries(data.answers||{})) {
+      const el=document.querySelector(`[name="${name}"]`);
+      if(!el) continue;
+      if(el.type==="radio") {
+        const r=document.querySelector(`[name="${name}"][value="${value}"]`);
+        if(r) r.checked=true;
+      } else el.value=value;
+    }
+  } catch(e) {
+    console.warn("Saved data could not be loaded.", e);
+  }
+  updateProgress();
+}
+
+function submitAssignment() {
+  const unanswered = [];
+  for(let i=1;i<=15;i++) if(!document.querySelector(`input[name="q${i}"]:checked`)) unanswered.push(i);
+  for(let i=1;i<=10;i++) if(!document.querySelector(`[name="c${i}"]`).value) unanswered.push("16-"+i);
+  for(let i=17;i<=22;i++) if(!document.querySelector(`[name="t${i}"]`).value.trim()) unanswered.push(i);
+  if(unanswered.length) {
+    if(!confirm("Some questions are still unanswered: " + unanswered.join(", ") + ". Submit anyway?")) return;
+  }
+  saveNow(false);
+  let correct=0;
+  for(let i=1;i<=15;i++) {
+    const v=document.querySelector(`input[name="q${i}"]:checked`)?.value;
+    if(v===ANSWERS[String(i)]) correct++;
+  }
+  for(let i=1;i<=10;i++) {
+    const v=document.querySelector(`[name="c${i}"]`).value;
+    if(v===ANSWERS["c"+i]) correct++;
+  }
+  const totalObjective=25;
+  const pct=(correct/totalObjective*100).toFixed(1);
+  document.getElementById("result").style.display="block";
+  document.getElementById("objectiveScore").textContent=`Objective score: ${correct} / ${totalObjective} (${pct}%)`;
+  document.getElementById("resultText").textContent="Your answers have been saved. Please keep the downloaded submission file if your teacher asks you to submit it.";
+  document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+
+function downloadSubmission() {
+  saveNow(false);
+  const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+  data.submittedAt=new Date().toISOString();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  const safe=(data.name||"student").replace(/[^\w\-\u4e00-\u9fff]/g,"_");
+  a.download=`Unit3_Assignment_${safe}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function resetAssignment() {
+  if(confirm("Reset all answers? This cannot be undone.")) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+document.addEventListener("input", updateProgress);
+document.addEventListener("change", updateProgress);
+loadSaved();
+</script>
+<script>
+const TEACHER_GRADES_KEY="unit3TeacherGrades";
+function setTeacherMode(on){document.body.classList.toggle("teacher-mode",on);if(on)loadSavedTeacherGrades()}
+function findAnswer(data,q){if(!data||typeof data!=="object")return "";if(data.answers&&typeof data.answers==="object")return data.answers[q]??data.answers[String(q)]??data.answers["q"+q]??"";return data[q]??data[String(q)]??data["q"+q]??data["question"+q]??""}
+function loadStudentSubmission(e){const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);window.studentSubmission=d;for(let q=17;q<=22;q++)document.getElementById("student"+q).textContent=findAnswer(d,q)||"No answer"}catch(x){alert("Invalid JSON submission file.")}};r.readAsText(f)}
+function saveTeacherGrades(){const g={};for(let q=17;q<=22;q++){const v=parseFloat(document.getElementById("grade"+q).value);if(Number.isFinite(v))g[q]=v}localStorage.setItem(TEACHER_GRADES_KEY,JSON.stringify(g));alert("Teacher grades saved.")}
+function loadSavedTeacherGrades(){try{const g=JSON.parse(localStorage.getItem(TEACHER_GRADES_KEY)||"{}");for(let q=17;q<=22;q++)if(g[q]!==undefined)document.getElementById("grade"+q).value=g[q]}catch(e){}}
+function calculateTeacherScore(){let t=0;for(let q=17;q<=22;q++){const v=parseFloat(document.getElementById("grade"+q).value);if(!Number.isFinite(v)||v<0||v>5){alert("Please enter a score from 0 to 5 for Q17–Q22.");return}t+=v}let o=window.studentSubmission?.objectiveScore??window.studentSubmission?.objective??null;o=parseFloat(o);if(!Number.isFinite(o)){o=parseFloat(prompt("Enter the student's objective score (0–70):"))}if(!Number.isFinite(o)||o<0||o>70){alert("Please enter a valid objective score from 0 to 70.");return}const f=o+t;document.getElementById("teacherResult").textContent="Final score: "+f.toFixed(1)+" / 100";document.getElementById("teacherBreakdown").textContent="Objective: "+o.toFixed(1)+" / 70 | Translation: "+t.toFixed(1)+" / 30";const g={objective:o,translation:t,final:f};for(let q=17;q<=22;q++)g[q]=parseFloat(document.getElementById("grade"+q).value);localStorage.setItem(TEACHER_GRADES_KEY,JSON.stringify(g))}
+</script></body>
+</html>
